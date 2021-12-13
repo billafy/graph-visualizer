@@ -1,0 +1,68 @@
+.graph-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	height: 100vh;
+	font-family: "Segoe UI";
+	.info {
+		display: flex;
+		gap: 1rem;
+		color: white;
+		button {
+			background: yellow;
+			border: 0px;
+			transition: 0.3s all ease;
+			&:hover {
+				transform: scale(1.1);
+			}
+		}
+	}
+	.graph {
+		height: 700px;
+		width: 700px;
+		max-width: 95%;
+		border: 1px solid white;
+		.row {
+			display: flex;
+			.cell {
+				border: 1px solid rgba(255, 255, 255, 0.2);
+				border-width: 0px 1px 1px 0px;
+				background: rgba(255, 255, 255, 0.1);
+				transition: 0.3s all ease;
+				&:last-child {
+					border-right: 0px;
+				}
+				&:hover {
+					background: rgba(255, 255, 255, 0.3);
+				}
+			}
+			.visited {
+				background: rgba(255, 255, 255, 0.6);
+			}
+			.obstacle {
+				background: yellow;
+			}
+			.path {
+				background: rgb(0, 0, 0);
+			}
+			.source {
+				background: hsla(150, 100, 50, 0.3);				
+			}
+			.source-visited {
+				background: hsla(150, 100, 50, 0.7) !important;
+			}
+			.dest {
+				background: hsla(10, 100, 50, 0.3);
+			}
+			.dest-visited {
+				background: hsla(10, 100, 50, 0.7) !important;
+			}
+			&:last-child {
+				.cell {
+					border-bottom: 0px;
+				}
+			}
+		}
+	}
+}
