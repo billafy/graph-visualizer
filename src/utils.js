@@ -21,3 +21,9 @@ export const squareManhattan = (n, x, y) => {
 	}
 	return dist;
 }
+
+export const moves = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+
+export const isInRange = (x, y, n) => {
+	return x >= 0 && x < n && y >= 0 && y < n;
+}
