@@ -5,10 +5,12 @@ import PriorityQueue from "js-priority-queue";
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
+const searchSpeed = 15, backtrackSpeed = 100;
+
 const Graph = () => {
 	const [graph, setGraph] = useState([]);
 	const [graphSize, setGraphSize] = useState(15);
-	const [points, setPoints] = useState({ source: [-1, -1], dest: [-1, -1] });
+	const [points, setPoints] = useState({ src: [-1, -1], dest: [-1, -1] });
 	const [searching, setSearching] = useState(false);
 	const [algorithm, setAlgorithm] = useState("Breadth First Search");
 	const graphRef = useRef(null);
@@ -17,11 +19,11 @@ const Graph = () => {
 		if (
 			!searching &&
 			event.buttons &&
-			points.source[0] !== -1 &&
+			points.src[0] !== -1 &&
 			points.dest[0] !== -1
 		) {
 			if (
-				(points.source[0] !== i || points.source[1]) !== j &&
+				(points.src[0] !== i || points.src[1]) !== j &&
 				(points.dest[0] !== i || points.dest[1] !== j)
 			) {
 				setGraph((_graph) => {
@@ -34,13 +36,13 @@ const Graph = () => {
 
 	const selectCell = (i, j) => {
 		if (searching) return;
-		if (points.source[0] === -1) setPoints({ ...points, source: [i, j] });
+		if (points.src[0] === -1) setPoints({ ...points, src: [i, j] });
 		else if (points.dest[0] === -1) {
-			if (points.source[0] !== i || points.source[1] !== j)
+			if (points.src[0] !== i || points.src[1] !== j)
 				setPoints({ ...points, dest: [i, j] });
 		} else {
 			if (
-				(points.source[0] !== i || points.source[1]) !== j &&
+				(points.src[0] !== i || points.src[1]) !== j &&
 				(points.dest[0] !== i || points.dest[1] !== j)
 			) {
 				setGraph((_graph) => {
@@ -53,7 +55,7 @@ const Graph = () => {
 
 	const getSelectInfo = () => {
 		if (searching) return "Searching...";
-		if (points.source[0] === -1) return "Select Source Cell";
+		if (points.src[0] === -1) return "Select Source Cell";
 		else if (points.dest[0] === -1) return "Select Destination Cell";
 		else return "Select Multiple Cells as Obstacles";
 	};
@@ -61,8 +63,8 @@ const Graph = () => {
 	const getCellClass = (i, j) => {
 		const visited = graph[i][j].visited,
 			explored = graph[i][j].explored;
-		if (points.source[0] === i && points.source[1] === j)
-			return `source ${visited ? "source-visited visited" : ""} ${
+		if (points.src[0] === i && points.src[1] === j)
+			return `src ${visited ? "src-visited visited" : ""} ${
 				explored ? "explored" : ""
 			}`;
 		else if (points.dest[0] === i && points.dest[1] === j)
@@ -79,7 +81,7 @@ const Graph = () => {
 	const backtrack = async (_graph) => {
 		let x = points.dest[0],
 			y = points.dest[1];
-		while (x !== points.source[0] || y !== points.source[1]) {
+		while (x !== points.src[0] || y !== points.src[1]) {
 			const a = x,
 				b = y;
 			x = _graph[a][b].prev[0];
@@ -87,16 +89,15 @@ const Graph = () => {
 			if (x === -1 || y === -1) break;
 			_graph[x][y].path = true;
 			setGraph([..._graph]);
-			await delay(100);
+			await delay(backtrackSpeed);
 		}
 		setGraph([...graph]);
 	};
 
 	const bfs = async () => {
-		setSearching(true);
-		let queue = [points.source];
+		let queue = [points.src];
 		let _graph = graph;
-		_graph[points.source[0]][points.source[1]].visited = true;
+		_graph[points.src[0]][points.src[1]].visited = true;
 		while (queue.length > 0) {
 			const [x, y] = queue[0];
 			if (x === points.dest[0] && y === points.dest[1]) break;
@@ -111,10 +112,10 @@ const Graph = () => {
 				}
 			});
 			setGraph([..._graph]);
-			await delay(1);
+			await delay(searchSpeed);
 			queue.shift();
 		}
-		backtrack(_graph);
+		await backtrack(_graph);
 	};
 
 	const dfsUtil = async (_graph, x, y) => {
@@ -129,7 +130,7 @@ const Graph = () => {
 				if (isInRange(x + i, y + j, graphSize)) {
 					if (isVisitable(_graph, x + i, y + j))
 						reached = await dfsUtil(_graph, x + i, y + j);
-					await delay(1);
+					await delay(searchSpeed);
 					if (reached) break;
 				}
 			}
@@ -142,16 +143,14 @@ const Graph = () => {
 	};
 
 	const dfs = () => {
-		setSearching(true);
 		let _graph = graph;
-		dfsUtil(_graph, points.source[0], points.source[1]);
+		dfsUtil(_graph, points.src[0], points.src[1]);
 	};
 
 	const aStar = async (type) => {
-		setSearching(true);
 		let _graph = graph,
-			x = points.source[0],
-			y = points.source[1];
+			x = points.src[0],
+			y = points.src[1];
 		let dist;
 		if (type === "manhattan")
 			dist = squareManhattan(graphSize, points.dest[0], points.dest[1]);
@@ -174,17 +173,19 @@ const Graph = () => {
 				}
 			});
 			setGraph([..._graph]);
-			await delay(1);
+			await delay(searchSpeed);
 		}
-		backtrack(_graph);
+		await backtrack(_graph);
 	};
 
-	const search = () => {
-		if (points.source[0] === -1 || points.dest[0] === -1) return;
-		if (algorithm === "Breadth First Search") bfs();
-		else if (algorithm === "Depth First Search") dfs();
-		else if (algorithm === "A* - Manhattan") aStar("manhattan");
-		else if (algorithm === "A* - Euclidean") aStar("euclidean");
+	const search = async () => {
+		if (points.src[0] === -1 || points.dest[0] === -1) return;
+		setSearching(true);
+		if (algorithm === "Breadth First Search") await bfs();
+		else if (algorithm === "Depth First Search") await dfs();
+		else if (algorithm === "A* - Manhattan") await aStar("manhattan");
+		else if (algorithm === "A* - Euclidean") await aStar("euclidean");
+		setSearching(false);
 	};
 
 	const defaultGraph = () => {
@@ -201,8 +202,7 @@ const Graph = () => {
 				});
 		}
 		setGraph(_graph);
-		setSearching(false);
-		setPoints({ source: [-1, -1], dest: [-1, -1] });
+		setPoints({ src: [-1, -1], dest: [-1, -1] });
 	};
 
 	useEffect(() => {
@@ -225,7 +225,7 @@ const Graph = () => {
 				<button onClick={search} disabled={searching}>
 					Start Search
 				</button>
-				<button onClick={defaultGraph}>Reset</button>
+				<button onClick={defaultGraph} disabled={searching}>Reset</button>
 			</p>
 			<div
 				className="graph"
