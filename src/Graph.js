@@ -148,6 +148,7 @@ const Graph = () => {
 	};
 
 	const aStar = async (type) => {
+		setSearching(true);
 		let _graph = graph,
 			x = points.source[0],
 			y = points.source[1];
@@ -241,7 +242,7 @@ const Graph = () => {
 							{graph.map((cell, j) => {
 								const cellClass = getCellClass(i, j);
 								return (
-									<button
+									<div
 										className={`cell ${cellClass} ${
 											graph[i][j].path ? "path" : ""
 										} ${
@@ -262,7 +263,7 @@ const Graph = () => {
 										onMouseEnter={(event) =>
 											selectObstacles(event, i, j)
 										}
-									></button>
+									></div>
 								);
 							})}
 						</div>

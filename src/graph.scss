@@ -30,6 +30,7 @@
 				border-width: 0px 1px 1px 0px;
 				background: rgba(255, 255, 255, 0.1);
 				transition: 0.3s all ease;
+				border-radius: 3px;
 				&:last-child {
 					border-right: 0px;
 				}
@@ -38,28 +39,28 @@
 				}
 			}
 			.visited {
-				background: rgba(255, 255, 255, 0.6);
+				background: rgba(255, 255, 255, 0.3);
 			}
 			.explored {
-				background: rgba(255, 255, 255, 0.8);
+				background: rgba(255, 255, 255, 0.4);
 			}
 			.obstacle {
-				background: yellow;
+				background: hsl(29, 91, 23);
 			}
 			.path {
 				background: rgb(0, 0, 0);
 			}
 			.source {
-				background: hsla(150, 100, 50, 0.3);				
+				background: hsla(83, 91, 55, 0.7);				
 			}
 			.source-visited {
-				background: hsla(150, 100, 50, 0.7) !important;
+				background: hsl(83, 91, 55) !important;
 			}
 			.dest {
-				background: hsla(10, 100, 50, 0.3);
+				background: hsla(350, 91, 55, 0.7);
 			}
 			.dest-visited {
-				background: hsla(10, 100, 50, 0.7) !important;
+				background: hsl(350, 91, 55) !important;
 			}
 			&:last-child {
 				.cell {
