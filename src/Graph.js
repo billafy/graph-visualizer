@@ -1,15 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./graph.scss";
-import { squareEuclidean, squareManhattan, moves, isInRange } from "./utils";
+import { squareEuclidean, squareManhattan, isInRange, delay } from "./utils";
+import {
+	moves,
+	backtrackSpeed,
+	searchSpeed,
+	cellSize,
+	graphHeight,
+} from "./constants";
 import PriorityQueue from "js-priority-queue";
-
-const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-
-const searchSpeed = 15, backtrackSpeed = 100;
 
 const Graph = () => {
 	const [graph, setGraph] = useState([]);
-	const [graphSize, setGraphSize] = useState(15);
+	const [graphSize, setGraphSize] = useState([
+		graphHeight / cellSize,
+		window.innerWidth / cellSize,
+	]);
 	const [points, setPoints] = useState({ src: [-1, -1], dest: [-1, -1] });
 	const [searching, setSearching] = useState(false);
 	const [algorithm, setAlgorithm] = useState("Breadth First Search");
@@ -103,12 +109,13 @@ const Graph = () => {
 			if (x === points.dest[0] && y === points.dest[1]) break;
 			_graph[x][y].explored = true;
 			moves.forEach(([i, j]) => {
-				if (isInRange(x + i, y + j, graphSize)) {
-					if (isVisitable(_graph, x + i, y + j)) {
-						_graph[x + i][y + j].visited = true;
-						_graph[x + i][y + j].prev = [x, y];
-						queue.push([x + i, y + j]);
-					}
+				if (
+					isInRange(x + i, y + j, graphSize) &&
+					isVisitable(_graph, x + i, y + j)
+				) {
+					_graph[x + i][y + j].visited = true;
+					_graph[x + i][y + j].prev = [x, y];
+					queue.push([x + i, y + j]);
 				}
 			});
 			setGraph([..._graph]);
@@ -142,9 +149,9 @@ const Graph = () => {
 		return reached;
 	};
 
-	const dfs = () => {
+	const dfs = async () => {
 		let _graph = graph;
-		dfsUtil(_graph, points.src[0], points.src[1]);
+		await dfsUtil(_graph, points.src[0], points.src[1]);
 	};
 
 	const aStar = async (type) => {
@@ -164,12 +171,13 @@ const Graph = () => {
 			[x, y] = pq.dequeue();
 			_graph[x][y].explored = true;
 			moves.forEach(([i, j]) => {
-				if (isInRange(x + i, y + j, graphSize)) {
-					if (isVisitable(_graph, x + i, y + j)) {
-						_graph[x + i][y + j].visited = true;
-						_graph[x + i][y + j].prev = [x, y];
-						pq.queue([x + i, y + j]);
-					}
+				if (
+					isInRange(x + i, y + j, graphSize) &&
+					isVisitable(_graph, x + i, y + j)
+				) {
+					_graph[x + i][y + j].visited = true;
+					_graph[x + i][y + j].prev = [x, y];
+					pq.queue([x + i, y + j]);
 				}
 			});
 			setGraph([..._graph]);
@@ -190,9 +198,9 @@ const Graph = () => {
 
 	const defaultGraph = () => {
 		let _graph = [];
-		for (let i = 0; i < graphSize; ++i) {
+		for (let i = 0; i < graphSize[0]; ++i) {
 			_graph.push([]);
-			for (let j = 0; j < graphSize; ++j)
+			for (let j = 0; j < graphSize[1]; ++j)
 				_graph[i].push({
 					visited: false,
 					prev: [-1, -1],
@@ -201,13 +209,24 @@ const Graph = () => {
 					obstacle: false,
 				});
 		}
-		setGraph(_graph);
+		setGraph([..._graph]);
 		setPoints({ src: [-1, -1], dest: [-1, -1] });
 	};
 
+	const changeGraphSize = () => {
+		setGraphSize([...[graphSize[0], window.innerWidth / cellSize]]);
+	};
+
+	useEffect(() => {
+		window.addEventListener("resize", changeGraphSize);
+		return () => {
+			window.removeEventListener("resize", changeGraphSize);
+		};
+	}, []);
+
 	useEffect(() => {
 		defaultGraph();
-	}, []);
+	}, [graphSize]);
 
 	return (
 		<div className="graph-container">
@@ -225,21 +244,19 @@ const Graph = () => {
 				<button onClick={search} disabled={searching}>
 					Start Search
 				</button>
-				<button onClick={defaultGraph} disabled={searching}>Reset</button>
+				<button onClick={defaultGraph} disabled={searching}>
+					Reset
+				</button>
 			</p>
 			<div
 				className="graph"
 				ref={graphRef}
-				style={
-					graphRef.current
-						? { height: graphRef.current.clientWidth }
-						: {}
-				}
+				style={{ height: `${graphHeight}px` }}
 			>
 				{graph.map((row, i) => {
 					return (
 						<div className="row" key={i}>
-							{graph.map((cell, j) => {
+							{graph[i].map((cell, j) => {
 								const cellClass = getCellClass(i, j);
 								return (
 									<div
@@ -252,12 +269,8 @@ const Graph = () => {
 										}`}
 										key={j}
 										style={{
-											width:
-												graphRef.current.clientWidth /
-												graphSize,
-											height:
-												graphRef.current.clientWidth /
-												graphSize,
+											height: `${cellSize}px`,
+											width: `${cellSize}px`,
 										}}
 										onClick={() => selectCell(i, j)}
 										onMouseEnter={(event) =>

@@ -1,14 +1,15 @@
 .graph-container {
 	display: flex;
-	justify-content: center;
-	align-items: center;
 	flex-direction: column;
-	height: 100vh;
 	font-family: "Segoe UI";
 	.info {
 		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin: 0px;
 		gap: 1rem;
 		color: white;
+		height: 100px;
 		button {
 			background: yellow;
 			border: 0px;
@@ -19,17 +20,16 @@
 		}
 	}
 	.graph {
-		height: 700px;
-		width: 700px;
-		max-width: 95%;
-		border: 1px solid white;
+		width: 100%;
+		border-top: 1px solid white;
+		border-bottom: 1px solid white;
 		.row {
 			display: flex;
 			.cell {
 				border: 1px solid rgba(255, 255, 255, 0.2);
 				border-width: 0px 1px 1px 0px;
 				background: rgba(255, 255, 255, 0.1);
-				transition: 0.3s all ease;
+				transition: 0.1s all ease;
 				border-radius: 3px;
 				&:last-child {
 					border-right: 0px;
