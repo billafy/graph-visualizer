@@ -20,6 +20,7 @@ const Graph = () => {
 	const [searching, setSearching] = useState(false);
 	const [algorithm, setAlgorithm] = useState("Breadth First Search");
 	const graphRef = useRef(null);
+	const [pathLength, setPathLength] = useState(0);
 
 	const selectObstacles = (event, i, j) => {
 		if (
@@ -63,7 +64,7 @@ const Graph = () => {
 		if (searching) return "Searching...";
 		if (points.src[0] === -1) return "Select Source Cell";
 		else if (points.dest[0] === -1) return "Select Destination Cell";
-		else return "Select Multiple Cells as Obstacles";
+		else return "Select Obstacles";
 	};
 
 	const getCellClass = (i, j) => {
@@ -94,6 +95,7 @@ const Graph = () => {
 			y = _graph[a][b].prev[1];
 			if (x === -1 || y === -1) break;
 			_graph[x][y].path = true;
+			setPathLength(_pathLength => _pathLength + 1);
 			setGraph([..._graph]);
 			await delay(backtrackSpeed);
 		}
@@ -143,6 +145,7 @@ const Graph = () => {
 			}
 		}
 		if (reached) {
+			setPathLength(_pathLength => _pathLength + 1);
 			_graph[x][y].path = true;
 			setGraph([..._graph]);
 		}
@@ -211,6 +214,7 @@ const Graph = () => {
 		}
 		setGraph([..._graph]);
 		setPoints({ src: [-1, -1], dest: [-1, -1] });
+		setPathLength(0);
 	};
 
 	const changeGraphSize = () => {
@@ -253,6 +257,7 @@ const Graph = () => {
 						Reset
 					</button>
 				</div>
+				<p>{!searching && pathLength ? `Path Length : ${pathLength}` : ''}</p>
 			</div>
 			<div
 				className="graph"

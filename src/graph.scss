@@ -78,7 +78,13 @@
 	}
 	@media (min-width: 0px) and (max-width: 668px) {
 		.options {
+			padding: 1rem 0px;
 			flex-direction: column;
+			height: 130px;
+			p {
+				padding: 0px;
+				margin: 0px;
+			}
 		}
 	}
 }
