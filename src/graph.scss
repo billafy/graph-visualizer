@@ -2,20 +2,27 @@
 	display: flex;
 	flex-direction: column;
 	font-family: "Segoe UI";
-	.info {
+	.options,
+	.dropdown,
+	.buttons {
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		gap: 1rem;
+	}
+	.options {
 		margin: 0px;
 		gap: 1rem;
 		color: white;
 		height: 100px;
-		button {
-			background: yellow;
-			border: 0px;
-			transition: 0.3s all ease;
-			&:hover {
-				transform: scale(1.1);
+		.buttons {
+			button {
+				background: yellow;
+				border: 0px;
+				transition: 0.3s all ease;
+				&:hover {
+					transform: scale(1.1);
+				}
 			}
 		}
 	}
@@ -30,7 +37,7 @@
 				border-width: 0px 1px 1px 0px;
 				background: rgba(255, 255, 255, 0.1);
 				transition: 0.1s all ease;
-				border-radius: 3px;
+				border-radius: 5px;
 				&:last-child {
 					border-right: 0px;
 				}
@@ -51,7 +58,7 @@
 				background: rgb(0, 0, 0);
 			}
 			.src {
-				background: hsla(83, 91, 55, 0.7);				
+				background: hsla(83, 91, 55, 0.7);
 			}
 			.src-visited {
 				background: hsl(83, 91, 55) !important;
@@ -67,6 +74,11 @@
 					border-bottom: 0px;
 				}
 			}
+		}
+	}
+	@media (min-width: 0px) and (max-width: 668px) {
+		.options {
+			flex-direction: column;
 		}
 	}
 }

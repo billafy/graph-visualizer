@@ -230,24 +230,30 @@ const Graph = () => {
 
 	return (
 		<div className="graph-container">
-			<p className="info">
-				{getSelectInfo()}
-				<select
-					value={algorithm}
-					onChange={({ target: { value } }) => setAlgorithm(value)}
-				>
-					<option>Breadth First Search</option>
-					<option>Depth First Search</option>
-					<option>A* - Manhattan</option>
-					<option>A* - Euclidean</option>
-				</select>
-				<button onClick={search} disabled={searching}>
-					Start Search
-				</button>
-				<button onClick={defaultGraph} disabled={searching}>
-					Reset
-				</button>
-			</p>
+			<div className="options">
+				<div className="dropdown">
+					{getSelectInfo()}
+					<select
+						value={algorithm}
+						onChange={({ target: { value } }) =>
+							setAlgorithm(value)
+						}
+					>
+						<option>Breadth First Search</option>
+						<option>Depth First Search</option>
+						<option>A* - Manhattan</option>
+						<option>A* - Euclidean</option>
+					</select>
+				</div>
+				<div className="buttons">
+					<button onClick={search} disabled={searching}>
+						Start Search
+					</button>
+					<button onClick={defaultGraph} disabled={searching}>
+						Reset
+					</button>
+				</div>
+			</div>
 			<div
 				className="graph"
 				ref={graphRef}
