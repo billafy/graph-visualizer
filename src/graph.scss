@@ -33,11 +33,12 @@
 		.row {
 			display: flex;
 			.cell {
-				border: 1px solid rgba(255, 255, 255, 0.2);
+				// border: 3px solid rgba(255, 255, 255, 0.2);
 				border-width: 0px 1px 1px 0px;
 				background: rgba(255, 255, 255, 0.1);
-				transition: 0.1s all ease;
-				border-radius: 5px;
+				transition: 0.3s all ease;
+				border-radius: 1px;
+				box-shadow: 0px 0px 1px black;
 				&:last-child {
 					border-right: 0px;
 				}
