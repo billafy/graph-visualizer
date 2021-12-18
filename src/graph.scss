@@ -1,36 +1,43 @@
 .graph-container {
 	display: flex;
-	justify-content: center;
-	align-items: center;
 	flex-direction: column;
-	height: 100vh;
 	font-family: "Segoe UI";
-	.info {
+	.options,
+	.dropdown,
+	.buttons {
 		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 1rem;
+	}
+	.options {
+		margin: 0px;
 		gap: 1rem;
 		color: white;
-		button {
-			background: yellow;
-			border: 0px;
-			transition: 0.3s all ease;
-			&:hover {
-				transform: scale(1.1);
+		height: 100px;
+		.buttons {
+			button {
+				background: yellow;
+				border: 0px;
+				transition: 0.3s all ease;
+				&:hover {
+					transform: scale(1.1);
+				}
 			}
 		}
 	}
 	.graph {
-		height: 700px;
-		width: 700px;
-		max-width: 95%;
-		border: 1px solid white;
+		width: 100%;
+		border-top: 1px solid white;
+		border-bottom: 1px solid white;
 		.row {
 			display: flex;
 			.cell {
 				border: 1px solid rgba(255, 255, 255, 0.2);
 				border-width: 0px 1px 1px 0px;
 				background: rgba(255, 255, 255, 0.1);
-				transition: 0.3s all ease;
-				border-radius: 3px;
+				transition: 0.1s all ease;
+				border-radius: 5px;
 				&:last-child {
 					border-right: 0px;
 				}
@@ -51,7 +58,7 @@
 				background: rgb(0, 0, 0);
 			}
 			.src {
-				background: hsla(83, 91, 55, 0.7);				
+				background: hsla(83, 91, 55, 0.7);
 			}
 			.src-visited {
 				background: hsl(83, 91, 55) !important;
@@ -66,6 +73,17 @@
 				.cell {
 					border-bottom: 0px;
 				}
+			}
+		}
+	}
+	@media (min-width: 0px) and (max-width: 668px) {
+		.options {
+			padding: 1rem 0px;
+			flex-direction: column;
+			height: 130px;
+			p {
+				padding: 0px;
+				margin: 0px;
 			}
 		}
 	}
