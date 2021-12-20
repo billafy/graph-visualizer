@@ -1,21 +1,27 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./graph.scss";
-import { squareEuclidean, squareManhattan, isInRange, delay } from "./utils";
+import "./styles/graph.scss";
+import {
+	squareEuclidean,
+	squareManhattan,
+	isInRange,
+	delay,
+	getDefaultGraph,
+} from "./utils/utils";
 import {
 	moves,
 	backtrackSpeed,
 	searchSpeed,
 	cellSize,
 	graphHeight,
-} from "./constants";
+} from "./utils/constants";
 import PriorityQueue from "js-priority-queue";
 
 const Graph = () => {
-	const [graph, setGraph] = useState([]);
 	const [graphSize, setGraphSize] = useState([
 		graphHeight / cellSize,
-		window.innerWidth / cellSize,
+		Math.ceil(window.innerWidth / cellSize),
 	]);
+	const [graph, setGraph] = useState(getDefaultGraph(graphSize));
 	const [points, setPoints] = useState({ src: [-1, -1], dest: [-1, -1] });
 	const [searching, setSearching] = useState(false);
 	const [algorithm, setAlgorithm] = useState("Breadth First Search");
@@ -62,8 +68,8 @@ const Graph = () => {
 
 	const getSelectInfo = () => {
 		if (searching) return "Searching...";
-		if (points.src[0] === -1) return "Select Source Cell";
-		else if (points.dest[0] === -1) return "Select Destination Cell";
+		if (points.src[0] === -1) return "Select Source";
+		else if (points.dest[0] === -1) return "Select Destination";
 		else return "Select Obstacles";
 	};
 
@@ -88,18 +94,25 @@ const Graph = () => {
 	const backtrack = async (_graph) => {
 		let x = points.dest[0],
 			y = points.dest[1];
+		const pathPoints = [];
 		while (x !== points.src[0] || y !== points.src[1]) {
 			const a = x,
 				b = y;
 			x = _graph[a][b].prev[0];
 			y = _graph[a][b].prev[1];
 			if (x === -1 || y === -1) break;
-			_graph[x][y].path = true;
-			setPathLength(_pathLength => _pathLength + 1);
-			setGraph([..._graph]);
+			if (a - x == 1 && b - y == 0) _graph[x][y].direction = "down";
+			else if (a - x == -1 && b - y == 0) _graph[x][y].direction = "up";
+			else if (a - x == 0 && b - y == 1) _graph[x][y].direction = "right";
+			else if (a - x == 0 && b - y == -1) _graph[x][y].direction = "left";
+			pathPoints.push([x, y]);
+		}
+		for(let i = pathPoints.length - 1; i >= 0; --i) {
+			_graph[pathPoints[i][0]][pathPoints[i][1]].path = true;
+			setGraph([...graph]);
+			setPathLength((_pathLength) => _pathLength + 1);
 			await delay(backtrackSpeed);
 		}
-		setGraph([...graph]);
 	};
 
 	const bfs = async () => {
@@ -125,36 +138,6 @@ const Graph = () => {
 			queue.shift();
 		}
 		await backtrack(_graph);
-	};
-
-	const dfsUtil = async (_graph, x, y) => {
-		_graph[x][y].visited = true;
-		setGraph([..._graph]);
-		if (x === points.dest[0] && y === points.dest[1]) return true;
-		let reached = false;
-		for (let i = -1; i <= 1; ++i) {
-			if (reached) break;
-			for (let j = -1; j <= 1; ++j) {
-				if (Math.abs(i) === Math.abs(j)) continue;
-				if (isInRange(x + i, y + j, graphSize)) {
-					if (isVisitable(_graph, x + i, y + j))
-						reached = await dfsUtil(_graph, x + i, y + j);
-					await delay(searchSpeed);
-					if (reached) break;
-				}
-			}
-		}
-		if (reached) {
-			setPathLength(_pathLength => _pathLength + 1);
-			_graph[x][y].path = true;
-			setGraph([..._graph]);
-		}
-		return reached;
-	};
-
-	const dfs = async () => {
-		let _graph = graph;
-		await dfsUtil(_graph, points.src[0], points.src[1]);
 	};
 
 	const aStar = async (type) => {
@@ -193,27 +176,32 @@ const Graph = () => {
 		if (points.src[0] === -1 || points.dest[0] === -1) return;
 		setSearching(true);
 		if (algorithm === "Breadth First Search") await bfs();
-		else if (algorithm === "Depth First Search") await dfs();
 		else if (algorithm === "A* - Manhattan") await aStar("manhattan");
 		else if (algorithm === "A* - Euclidean") await aStar("euclidean");
 		setSearching(false);
 	};
 
 	const defaultGraph = () => {
-		let _graph = [];
-		for (let i = 0; i < graphSize[0]; ++i) {
-			_graph.push([]);
-			for (let j = 0; j < graphSize[1]; ++j)
-				_graph[i].push({
-					visited: false,
-					prev: [-1, -1],
-					explored: false,
-					path: false,
-					obstacle: false,
-				});
-		}
-		setGraph([..._graph]);
+		setGraph(getDefaultGraph(graphSize));
 		setPoints({ src: [-1, -1], dest: [-1, -1] });
+		setPathLength(0);
+	};
+
+	const updateAlgorithm = (_algorithm) => {
+		setGraph((_graph) => {
+			return _graph.map((_row) => {
+				return _row.map((_cell) => {
+					return {
+						visited: false,
+						prev: [-1, -1],
+						explored: false,
+						path: false,
+						obstacle: _cell.obstacle,
+					};
+				});
+			});
+		});
+		setAlgorithm(_algorithm);
 		setPathLength(0);
 	};
 
@@ -229,22 +217,22 @@ const Graph = () => {
 	}, []);
 
 	useEffect(() => {
-		defaultGraph();
+		defaultGraph(true);
 	}, [graphSize]);
 
 	return (
-		<div className="graph-container">
+		<div className="graph-container dark">
 			<div className="options">
 				<div className="dropdown">
 					{getSelectInfo()}
 					<select
 						value={algorithm}
 						onChange={({ target: { value } }) =>
-							setAlgorithm(value)
+							updateAlgorithm(value)
 						}
+						disabled={searching}
 					>
 						<option>Breadth First Search</option>
-						<option>Depth First Search</option>
 						<option>A* - Manhattan</option>
 						<option>A* - Euclidean</option>
 					</select>
@@ -253,11 +241,18 @@ const Graph = () => {
 					<button onClick={search} disabled={searching}>
 						Start Search
 					</button>
-					<button onClick={defaultGraph} disabled={searching}>
-						Reset
+					<button
+						onClick={() => defaultGraph(true)}
+						disabled={searching}
+					>
+						Reset Graph
 					</button>
 				</div>
-				<p>{!searching && pathLength ? `Path Length : ${pathLength}` : ''}</p>
+				<p>
+					{!searching && pathLength
+						? `Path Length : ${pathLength}`
+						: ""}
+				</p>
 			</div>
 			<div
 				className="graph"
@@ -272,12 +267,8 @@ const Graph = () => {
 								return (
 									<div
 										className={`cell ${cellClass} ${
-											graph[i][j].path ? "path" : ""
-										} ${
-											graph[i][j].obstacle
-												? "obstacle"
-												: ""
-										}`}
+											cell.path ? "path" : ""
+										} ${cell.obstacle ? "obstacle" : ""}`}
 										key={j}
 										style={{
 											height: `${cellSize}px`,
@@ -287,7 +278,16 @@ const Graph = () => {
 										onMouseEnter={(event) =>
 											selectObstacles(event, i, j)
 										}
-									></div>
+									>
+										{cell.path ? (
+											<img
+												src={`${cell.direction}.png`}
+												style={{ width: 750 / cellSize }}
+											/>
+										) : (
+											<></>
+										)}
+									</div>
 								);
 							})}
 						</div>
