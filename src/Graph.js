@@ -19,7 +19,7 @@ import PriorityQueue from "js-priority-queue";
 const Graph = () => {
 	const [graphSize, setGraphSize] = useState([
 		graphHeight / cellSize,
-		Math.ceil(window.innerWidth / cellSize),
+		Math.floor(window.innerWidth / cellSize),
 	]);
 	const [graph, setGraph] = useState(getDefaultGraph(graphSize));
 	const [points, setPoints] = useState({ src: [-1, -1], dest: [-1, -1] });
@@ -101,10 +101,10 @@ const Graph = () => {
 			x = _graph[a][b].prev[0];
 			y = _graph[a][b].prev[1];
 			if (x === -1 || y === -1) break;
-			if (a - x == 1 && b - y == 0) _graph[x][y].direction = "down";
-			else if (a - x == -1 && b - y == 0) _graph[x][y].direction = "up";
-			else if (a - x == 0 && b - y == 1) _graph[x][y].direction = "right";
-			else if (a - x == 0 && b - y == -1) _graph[x][y].direction = "left";
+			if (a - x === 1 && b - y === 0) _graph[x][y].direction = "down";
+			else if (a - x === -1 && b - y === 0) _graph[x][y].direction = "up";
+			else if (a - x === 0 && b - y === 1) _graph[x][y].direction = "right";
+			else if (a - x === 0 && b - y === -1) _graph[x][y].direction = "left";
 			pathPoints.push([x, y]);
 		}
 		for(let i = pathPoints.length - 1; i >= 0; --i) {
@@ -206,7 +206,9 @@ const Graph = () => {
 	};
 
 	const changeGraphSize = () => {
-		setGraphSize([...[graphSize[0], window.innerWidth / cellSize]]);
+		const newWidth = window.innerWidth / cellSize;
+		if(Math.floor(newWidth) !== graphSize[1]) 
+			setGraphSize([...[graphSize[0], window.innerWidth / cellSize]]);
 	};
 
 	useEffect(() => {
@@ -283,6 +285,7 @@ const Graph = () => {
 											<img
 												src={`${cell.direction}.png`}
 												style={{ width: 750 / cellSize }}
+												alt='arrow'
 											/>
 										) : (
 											<></>
