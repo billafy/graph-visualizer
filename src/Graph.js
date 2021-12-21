@@ -27,6 +27,7 @@ const Graph = () => {
 	const [algorithm, setAlgorithm] = useState("Breadth First Search");
 	const graphRef = useRef(null);
 	const [pathLength, setPathLength] = useState(0);
+	const [exploredCount, setExploredCount] = useState(0);
 
 	const selectObstacles = (event, i, j) => {
 		if (
@@ -103,11 +104,13 @@ const Graph = () => {
 			if (x === -1 || y === -1) break;
 			if (a - x === 1 && b - y === 0) _graph[x][y].direction = "down";
 			else if (a - x === -1 && b - y === 0) _graph[x][y].direction = "up";
-			else if (a - x === 0 && b - y === 1) _graph[x][y].direction = "right";
-			else if (a - x === 0 && b - y === -1) _graph[x][y].direction = "left";
+			else if (a - x === 0 && b - y === 1)
+				_graph[x][y].direction = "right";
+			else if (a - x === 0 && b - y === -1)
+				_graph[x][y].direction = "left";
 			pathPoints.push([x, y]);
 		}
-		for(let i = pathPoints.length - 1; i >= 0; --i) {
+		for (let i = pathPoints.length - 1; i >= 0; --i) {
 			_graph[pathPoints[i][0]][pathPoints[i][1]].path = true;
 			setGraph([...graph]);
 			setPathLength((_pathLength) => _pathLength + 1);
@@ -123,6 +126,7 @@ const Graph = () => {
 			const [x, y] = queue[0];
 			if (x === points.dest[0] && y === points.dest[1]) break;
 			_graph[x][y].explored = true;
+			setExploredCount((_exploredCount) => _exploredCount + 1);
 			moves.forEach(([i, j]) => {
 				if (
 					isInRange(x + i, y + j, graphSize) &&
@@ -156,6 +160,7 @@ const Graph = () => {
 			if (x === points.dest[0] && y === points.dest[1]) break;
 			[x, y] = pq.dequeue();
 			_graph[x][y].explored = true;
+			setExploredCount((_exploredCount) => _exploredCount + 1);
 			moves.forEach(([i, j]) => {
 				if (
 					isInRange(x + i, y + j, graphSize) &&
@@ -185,6 +190,7 @@ const Graph = () => {
 		setGraph(getDefaultGraph(graphSize));
 		setPoints({ src: [-1, -1], dest: [-1, -1] });
 		setPathLength(0);
+		setExploredCount(0);
 	};
 
 	const updateAlgorithm = (_algorithm) => {
@@ -203,11 +209,12 @@ const Graph = () => {
 		});
 		setAlgorithm(_algorithm);
 		setPathLength(0);
+		setExploredCount(0);
 	};
 
 	const changeGraphSize = () => {
 		const newWidth = window.innerWidth / cellSize;
-		if(Math.floor(newWidth) !== graphSize[1]) 
+		if (Math.floor(newWidth) !== graphSize[1])
 			setGraphSize([...[graphSize[0], window.innerWidth / cellSize]]);
 	};
 
@@ -250,11 +257,24 @@ const Graph = () => {
 						Reset Graph
 					</button>
 				</div>
-				<p>
-					{!searching && pathLength
-						? `Path Length : ${pathLength}`
-						: ""}
-				</p>
+				<div className="stats">
+					<p>
+						{!searching && pathLength ? "Path Length " : ""}
+						{!searching && pathLength ? (
+							<span>{pathLength}</span>
+						) : (
+							""
+						)}
+					</p>
+					<p>
+						{!searching && pathLength ? "Explored Nodes " : ""}
+						{!searching && pathLength ? (
+							<span>{exploredCount - 1}</span>
+						) : (
+							""
+						)}
+					</p>
+				</div>
 			</div>
 			<div
 				className="graph"
@@ -284,8 +304,10 @@ const Graph = () => {
 										{cell.path ? (
 											<img
 												src={`${cell.direction}.png`}
-												style={{ width: 750 / cellSize }}
-												alt='arrow'
+												style={{
+													width: 750 / cellSize,
+												}}
+												alt="arrow"
 											/>
 										) : (
 											<></>

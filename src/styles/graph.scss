@@ -4,6 +4,7 @@
 	font-family: "Segoe UI";
 	.options,
 	.dropdown,
+	.stats, 
 	.buttons {
 		display: flex;
 		justify-content: center;
@@ -37,6 +38,19 @@
 				padding: 0.25rem 0.5rem;
 				&:hover {
 					transform: scale(1.1);
+				}
+			}
+		}
+		.stats {
+			flex-direction: column;
+			gap: 0.5rem;
+			p {
+				margin: 0px;
+				span {
+					background: #FFD700;
+					padding: 0.125rem 0.25rem;
+					border-radius: 5px;
+					color: #000;
 				}
 			}
 		}
