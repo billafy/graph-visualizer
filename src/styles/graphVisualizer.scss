@@ -113,10 +113,13 @@
 		.options {
 			padding: 1rem 0px;
 			flex-direction: column;
-			height: 130px;
+			height: 140px;
 			p {
 				padding: 0px;
 				margin: 0px;
+			}
+			.stats {
+				flex-direction: row;
 			}
 		}
 	}

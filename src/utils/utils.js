@@ -46,34 +46,6 @@ export const isInRange = (x, y, n) => {
 	return x >= 0 && x < n[0] && y >= 0 && y < n[1];
 };
 
-/*
-const dfsUtil = async (_graph, x, y) => {
-	_graph[x][y].visited = true;
-	setGraph([..._graph]);
-	if (x === points.dest[0] && y === points.dest[1]) return true;
-	let reached = false;
-	for (let i = -1; i <= 1; ++i) {
-		if (reached) break;
-		for (let j = -1; j <= 1; ++j) {
-			if (Math.abs(i) === Math.abs(j)) continue;
-			if (isInRange(x + i, y + j, graphSize)) {
-				if (isVisitable(_graph, x + i, y + j))
-					reached = await dfsUtil(_graph, x + i, y + j);
-				await delay(searchSpeed);
-				if (reached) break;
-			}
-		}
-	}
-	if (reached) {
-		setPathLength((_pathLength) => _pathLength + 1);
-		_graph[x][y].path = true;
-		setGraph([..._graph]);
-	}
-	return reached;
-};
-
-const dfs = async () => {
-	let _graph = graph;
-	await dfsUtil(_graph, points.src[0], points.src[1]);
-};
-*/
+export const isVisitable = (graph, i, j) => {
+	return !graph[i][j].visited && !graph[i][j].obstacle;
+}

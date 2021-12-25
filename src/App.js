@@ -1,9 +1,13 @@
 import React from "react";
-
-import Graph from "./Graph";
+import GraphVisualizer from "./components/GraphVisualizer";
+import GraphProvider from "./context";
 
 const App = () => {
-	return <Graph />;
+	return (
+		<GraphProvider>
+			<GraphVisualizer />
+		</GraphProvider>
+	);
 };
 
 export default App;

@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
-import "./styles/graph.scss";
+import React, { useState } from "react";
 import {
 	squareEuclidean,
 	squareManhattan,
 	isInRange,
 	delay,
 	getDefaultGraph,
+	isVisitable,
 } from "./utils/utils";
 import {
 	moves,
@@ -16,7 +16,9 @@ import {
 } from "./utils/constants";
 import PriorityQueue from "js-priority-queue";
 
-const Graph = () => {
+export const GraphContext = React.createContext();
+
+const GraphProvider = ({ children }) => {
 	const [graphSize, setGraphSize] = useState([
 		graphHeight / cellSize,
 		Math.floor(window.innerWidth / cellSize),
@@ -25,7 +27,6 @@ const Graph = () => {
 	const [points, setPoints] = useState({ src: [-1, -1], dest: [-1, -1] });
 	const [searching, setSearching] = useState(false);
 	const [algorithm, setAlgorithm] = useState("Breadth First Search");
-	const graphRef = useRef(null);
 	const [pathLength, setPathLength] = useState(0);
 	const [exploredCount, setExploredCount] = useState(0);
 
@@ -50,7 +51,12 @@ const Graph = () => {
 
 	const selectCell = (i, j) => {
 		if (searching) return;
-		if (points.src[0] === -1) setPoints({ ...points, src: [i, j] });
+		if (graph[i][j].obstacle) {
+			setGraph((_graph) => {
+				_graph[i][j].obstacle = false;
+				return [...graph];
+			});
+		} else if (points.src[0] === -1) setPoints({ ...points, src: [i, j] });
 		else if (points.dest[0] === -1) {
 			if (points.src[0] !== i || points.src[1] !== j)
 				setPoints({ ...points, dest: [i, j] });
@@ -65,31 +71,6 @@ const Graph = () => {
 				});
 			}
 		}
-	};
-
-	const getSelectInfo = () => {
-		if (searching) return "Searching...";
-		if (points.src[0] === -1) return "Select Source";
-		else if (points.dest[0] === -1) return "Select Destination";
-		else return "Select Obstacles";
-	};
-
-	const getCellClass = (i, j) => {
-		const visited = graph[i][j].visited,
-			explored = graph[i][j].explored;
-		if (points.src[0] === i && points.src[1] === j)
-			return `src ${visited ? "src-visited visited" : ""} ${
-				explored ? "explored" : ""
-			}`;
-		else if (points.dest[0] === i && points.dest[1] === j)
-			return `dest ${visited ? "dest-visited visited" : ""} ${
-				explored ? "explored" : ""
-			}`;
-		return `${visited ? "visited" : ""} ${explored ? "explored" : ""}`;
-	};
-
-	const isVisitable = (_graph, i, j) => {
-		return !_graph[i][j].visited && !_graph[i][j].obstacle;
 	};
 
 	const backtrack = async (_graph) => {
@@ -212,115 +193,33 @@ const Graph = () => {
 		setExploredCount(0);
 	};
 
-	const changeGraphSize = () => {
+	const updateGraphSize = () => {
 		const newWidth = window.innerWidth / cellSize;
 		if (Math.floor(newWidth) !== graphSize[1])
 			setGraphSize([...[graphSize[0], window.innerWidth / cellSize]]);
 	};
 
-	useEffect(() => {
-		window.addEventListener("resize", changeGraphSize);
-		return () => {
-			window.removeEventListener("resize", changeGraphSize);
-		};
-	}, []);
-
-	useEffect(() => {
-		defaultGraph(true);
-	}, [graphSize]);
-
 	return (
-		<div className="graph-container dark">
-			<div className="options">
-				<div className="dropdown">
-					{getSelectInfo()}
-					<select
-						value={algorithm}
-						onChange={({ target: { value } }) =>
-							updateAlgorithm(value)
-						}
-						disabled={searching}
-					>
-						<option>Breadth First Search</option>
-						<option>A* - Manhattan</option>
-						<option>A* - Euclidean</option>
-					</select>
-				</div>
-				<div className="buttons">
-					<button onClick={search} disabled={searching}>
-						Start Search
-					</button>
-					<button
-						onClick={() => defaultGraph(true)}
-						disabled={searching}
-					>
-						Reset Graph
-					</button>
-				</div>
-				<div className="stats">
-					<p>
-						{!searching && pathLength ? "Path Length " : ""}
-						{!searching && pathLength ? (
-							<span>{pathLength}</span>
-						) : (
-							""
-						)}
-					</p>
-					<p>
-						{!searching && pathLength ? "Explored Nodes " : ""}
-						{!searching && pathLength ? (
-							<span>{exploredCount - 1}</span>
-						) : (
-							""
-						)}
-					</p>
-				</div>
-			</div>
-			<div
-				className="graph"
-				ref={graphRef}
-				style={{ height: `${graphHeight}px` }}
-			>
-				{graph.map((row, i) => {
-					return (
-						<div className="row" key={i}>
-							{graph[i].map((cell, j) => {
-								const cellClass = getCellClass(i, j);
-								return (
-									<div
-										className={`cell ${cellClass} ${
-											cell.path ? "path" : ""
-										} ${cell.obstacle ? "obstacle" : ""}`}
-										key={j}
-										style={{
-											height: `${cellSize}px`,
-											width: `${cellSize}px`,
-										}}
-										onClick={() => selectCell(i, j)}
-										onMouseEnter={(event) =>
-											selectObstacles(event, i, j)
-										}
-									>
-										{cell.path ? (
-											<img
-												src={`${cell.direction}.png`}
-												style={{
-													width: 750 / cellSize,
-												}}
-												alt="arrow"
-											/>
-										) : (
-											<></>
-										)}
-									</div>
-								);
-							})}
-						</div>
-					);
-				})}
-			</div>
-		</div>
+		<GraphContext.Provider
+			value={{
+				algorithm,
+				updateAlgorithm,
+				searching,
+				search,
+				defaultGraph,
+				pathLength,
+				exploredCount,
+				graph,
+				selectCell,
+				selectObstacles,
+				points,
+				graphSize,
+				updateGraphSize,
+			}}
+		>
+			{children}
+		</GraphContext.Provider>
 	);
 };
 
-export default Graph;
+export default GraphProvider;
