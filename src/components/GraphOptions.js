@@ -1,8 +1,18 @@
-import {useContext} from 'react';
-import {GraphContext} from '../context';
+import { useContext } from "react";
+import { GraphContext } from "../context";
 
 const GraphOptions = () => {
-	const {searching, points, algorithm, updateAlgorithm, search, defaultGraph, pathLength, exploredCount} = useContext(GraphContext);
+	const {
+		searching,
+		points,
+		algorithm,
+		updateAlgorithm,
+		search,
+		defaultGraph,
+		pathLength,
+		exploredCount,
+		getMaze,
+	} = useContext(GraphContext);
 
 	const getSelectInfo = () => {
 		if (searching) return "Searching...";
@@ -29,8 +39,11 @@ const GraphOptions = () => {
 				<button onClick={search} disabled={searching}>
 					Start Search
 				</button>
-				<button onClick={() => defaultGraph(true)} disabled={searching}>
+				<button onClick={defaultGraph} disabled={searching}>
 					Reset Graph
+				</button>
+				<button onClick={getMaze} disabled={searching}>
+					Generate Maze
 				</button>
 			</div>
 			<div className="stats">

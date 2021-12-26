@@ -1,3 +1,4 @@
+import { moves } from "./constants";
 export const getDefaultGraph = (n) => {
 	let _graph = [];
 	for (let i = 0; i < n[0]; ++i) {
@@ -12,7 +13,7 @@ export const getDefaultGraph = (n) => {
 			});
 	}
 	return _graph;
-}
+};
 
 export const squareEuclidean = (n, x, y) => {
 	let dist = [];
@@ -48,4 +49,59 @@ export const isInRange = (x, y, n) => {
 
 export const isVisitable = (graph, i, j) => {
 	return !graph[i][j].visited && !graph[i][j].obstacle;
-}
+};
+
+export const randomInt = (max, min) => {
+	return Math.floor(Math.random() * (max - min) + min);
+};
+
+// random maze generator
+
+const getRandomMove = (graph, i, j, n) => {
+	const possibleMoves = [];
+	moves.forEach((move) => {
+		if (
+			i + move[0] >= 0 &&
+			i + move[0] < n[0] &&
+			j + move[1] >= 0 &&
+			j + move[1] < n[1] &&
+			!graph[i + move[0]][j + move[1]].visited &&
+			!graph[i + move[0]][j + move[1]].obstacle
+		) 
+			possibleMoves.push([i + move[0], j + move[1]]);
+	});
+	if(!possibleMoves.length) 
+		return false;
+	return possibleMoves[randomInt(0, possibleMoves.length)];
+};
+
+export const generateMaze = (n) => {
+	let graph = getDefaultGraph(n),
+		src = [randomInt(0, n[0]), randomInt(0, n[1])],
+		dest = [-1, -1],
+		maxDepth = 0;
+	const stack = [src];
+	while (stack.length) {
+		const node = stack.at(-1);
+		const adjNode = getRandomMove(graph, node[0], node[1], n);
+		if(!adjNode) {
+			stack.pop();
+			continue;
+		}
+		graph[adjNode[0]][adjNode[1]].visited = true;
+		stack.push(adjNode);
+		const wallNode = getRandomMove(graph, node[0], node[1], n);
+		if(wallNode) 
+			graph[wallNode[0]][wallNode[1]].obstacle = true;
+		if(stack.length > maxDepth) {
+			dest = adjNode;
+			maxDepth = stack.length;
+		}
+	}
+	graph.forEach(row => {
+		row.forEach(cell => {
+			cell.visited = false;
+		})
+	})
+	return {graph, src, dest};
+};

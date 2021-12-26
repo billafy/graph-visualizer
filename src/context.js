@@ -6,6 +6,7 @@ import {
 	delay,
 	getDefaultGraph,
 	isVisitable,
+	generateMaze,
 } from "./utils/utils";
 import {
 	moves,
@@ -174,6 +175,12 @@ const GraphProvider = ({ children }) => {
 		setExploredCount(0);
 	};
 
+	const getMaze = () => {
+		const maze = generateMaze(graphSize);
+		setGraph([...maze.graph]);
+		setPoints({src: maze.src, dest: maze.dest});
+	}
+
 	const updateAlgorithm = (_algorithm) => {
 		setGraph((_graph) => {
 			return _graph.map((_row) => {
@@ -215,6 +222,7 @@ const GraphProvider = ({ children }) => {
 				points,
 				graphSize,
 				updateGraphSize,
+				getMaze,
 			}}
 		>
 			{children}

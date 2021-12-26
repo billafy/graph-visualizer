@@ -1,9 +1,10 @@
-import {useContext} from 'react';
+import { useContext } from "react";
 import { graphHeight, cellSize } from "../utils/constants";
-import {GraphContext} from '../context';
+import { GraphContext } from "../context";
 
 const Graph = () => {
-	const {graph, points, selectCell, selectObstacles} = useContext(GraphContext);
+	const { graph, points, selectCell, selectObstacles } =
+		useContext(GraphContext);
 
 	const getCellClass = (i, j) => {
 		const visited = graph[i][j].visited,

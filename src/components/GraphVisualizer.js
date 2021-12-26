@@ -19,7 +19,7 @@ const GraphVisualizer = () => {
 	});
 
 	useEffect(() => {
-		defaultGraph(true);
+		defaultGraph();
 	}, [graphSize]);
 
 	return (
