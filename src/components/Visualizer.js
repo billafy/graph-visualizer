@@ -2,9 +2,9 @@ import React, { useEffect, useContext } from "react";
 import { GraphContext } from "../context";
 import Graph from './Graph';
 import GraphOptions from './GraphOptions';
-import "../styles/graphVisualizer.scss";
+import "../styles/visualizer.scss";
 
-const GraphVisualizer = () => {
+const Visualizer = () => {
 	const {
 		defaultGraph,
 		graphSize,
@@ -30,4 +30,4 @@ const GraphVisualizer = () => {
 	);
 };
 
-export default GraphVisualizer;
+export default Visualizer;

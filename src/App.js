@@ -1,11 +1,11 @@
 import React from "react";
-import GraphVisualizer from "./components/GraphVisualizer";
+import Visualizer from "./components/Visualizer";
 import GraphProvider from "./context";
 
 const App = () => {
 	return (
 		<GraphProvider>
-			<GraphVisualizer />
+			<Visualizer />
 		</GraphProvider>
 	);
 };
