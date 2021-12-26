@@ -103,5 +103,5 @@ export const generateMaze = (n) => {
 			cell.visited = false;
 		})
 	})
-	return {graph, src, dest};
+	return {graph, src: [-1, -1], dest: [-1, -1]};
 };
