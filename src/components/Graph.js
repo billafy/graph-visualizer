@@ -46,7 +46,7 @@ const Graph = () => {
 										<img
 											src={`${cell.direction}.png`}
 											style={{
-												width: 750 / cellSize,
+												width: 550 / cellSize,
 											}}
 											alt="arrow"
 										/>

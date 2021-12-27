@@ -1,3 +1,5 @@
+@import 'visualizer.scss';
+
 * {
 	box-sizing: border-box;
 	font-size: 16px;
@@ -10,7 +12,7 @@ img {
     user-select: none;
 }
 body {
-	background: #191a19;
+	background: $primary;
 	margin: 0px;
 }
 select, button, input {

@@ -1,10 +1,20 @@
+$primary: #1a1b1c;
+$secondary: #FCF55F;
+$text: #f1f1f1;
+$cell: rgba(255, 255, 255, 0.1);
+$shadow: 1px 1px 1px #000;
+$visited: rgba(255, 255, 255, 0.2);
+$explored: rgba(255, 255, 255, 0.4);
+$src: hsl(83, 91, 55);
+$dest: hsl(350, 91, 55);
+
 .graph-container {
 	display: flex;
 	flex-direction: column;
 	font-family: "Segoe UI";
 	.options,
 	.dropdown,
-	.stats, 
+	.stats,
 	.buttons {
 		display: flex;
 		justify-content: center;
@@ -14,28 +24,30 @@
 	.options {
 		margin: 0px;
 		gap: 1rem;
-		color: white;
+		color: $text;
 		height: 100px;
 		.dropdown {
 			select {
 				padding: 0.25rem 0.75rem;
 				border-radius: 5px;
 				border: 0px;
-				border-bottom: 3px solid #FFD700;
+				border-bottom: 3px solid $secondary;
 				background: transparent;
-				color: white;
+				color: $text;
 				option {
-					color: #000;
+					color: $primary;
 				}
 			}
 		}
 		.buttons {
 			button {
-				background: #FFD700;
+				background: $secondary;
 				border: 0px;
 				transition: 0.3s all ease;
-				border-radius: 5px;
-				padding: 0.25rem 0.5rem;
+				border-radius: 9999px;
+				box-shadow: 0px 0px 10px $secondary;
+				box-shadow: 0px 0px 10px $secondary;
+				padding: 0.25rem 0.75rem;
 				&:hover {
 					transform: scale(1.1);
 				}
@@ -47,28 +59,30 @@
 			p {
 				margin: 0px;
 				span {
-					background: #FFD700;
+					background: $secondary;
 					padding: 0.125rem 0.25rem;
 					border-radius: 5px;
-					color: #000;
+					color: $primary;
 				}
 			}
 		}
 	}
 	.graph {
 		width: 100%;
-		border-top: 1px solid white;
-		border-bottom: 1px solid white;
+		border-top: 1px solid $text;
+		border-bottom: 1px solid $text;
+		overflow: hidden;
 		.row {
 			display: flex;
 			.cell {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-				background: rgba(255, 255, 255, 0.1);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				background: $cell;
 				transition: 0.3s all ease;
 				border-radius: 1px;
-				box-shadow: 1px 1px 1px black;
+				box-shadow: $shadow;
+				transform: scale(0.9);
 				&:last-child {
 					border-right: 0px;
 				}
@@ -77,30 +91,33 @@
 				}
 			}
 			.visited {
-				background: rgba(255, 255, 255, 0.2);
+				background: $visited;
 			}
 			.explored {
-				background: rgba(255, 255, 255, 0.4);
+				background: $explored;
 			}
 			.obstacle {
-				background: url('../images/wall.png');
+				background: url("../images/wall.png");
+				transform: scale(0.75);
 			}
 			.path {
-				background: rgb(0, 0, 0);
-				border: 1px solid white;
+				background: $primary;
+				border: 1px solid $text;
 			}
 			.src {
-				background: hsla(83, 91, 55, 0.7);
+				background: $src;
+				opacity: 0.7;
 			}
 			.src-visited {
 				border: 0px;
-				background: hsl(83, 91, 55);
+				opacity: 1;
 			}
 			.dest {
-				background: hsla(350, 91, 55, 0.7);
+				background: $dest;
+				opacity: 0.7;
 			}
 			.dest-visited {
-				background: hsl(350, 91, 55) !important;
+				opacity: 1;
 			}
 			&:last-child {
 				.cell {
