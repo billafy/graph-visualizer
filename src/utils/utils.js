@@ -1,4 +1,3 @@
-import { moves } from "./constants";
 export const getDefaultGraph = (n) => {
 	let _graph = [];
 	for (let i = 0; i < n[0]; ++i) {
@@ -55,9 +54,59 @@ export const randomInt = (max, min) => {
 	return Math.floor(Math.random() * (max - min) + min);
 };
 
-// random maze generator
 
+// maze generation 2.0.0
+
+const moves = [[[-2, 0], [-1, 0]], [[0, -2], [0, -1]], [[0, 2], [0, 1]], [[2, 0], [1, 0]]];
 const getRandomMove = (graph, i, j, n) => {
+	const possibleMoves = [];
+	moves.forEach(([move, wallMove]) => {
+		if (
+			i + move[0] >= 0 &&
+			i + move[0] < n[0] &&
+			j + move[1] >= 0 &&
+			j + move[1] < n[1] &&
+			!graph[i + move[0]][j + move[1]].visited &&
+			!graph[i + move[0]][j + move[1]].obstacle
+		) 
+			possibleMoves.push([[i + move[0], j + move[1]], [i + wallMove[0], j + wallMove[1]]]);
+	});
+	if(!possibleMoves.length) 
+		return [false, false];
+	return possibleMoves[randomInt(0, possibleMoves.length)];
+};
+
+export const generateMaze = (n) => {
+	let graph = getDefaultGraph(n), src = [0, 0];
+	for(let i = 0; i < n[0]; ++i) {
+		let step = i % 2 ? 1 : 2, start = !(i % 2) ? 1 : 0;
+		for(let j = start; j < n[1]; j += step) 
+			graph[i][j].obstacle = true;
+	}
+	let stack = [src];
+	while(stack.length) {
+		const node = stack.at(-1);
+		const [move, wallMove] = getRandomMove(graph, node[0], node[1], n);
+		if(!move) {
+			stack.pop();
+			continue;
+		}
+		graph[move[0]][move[1]].visited = true;
+		graph[wallMove[0]][wallMove[1]].visited = true;
+		graph[wallMove[0]][wallMove[1]].obstacle = false;
+		stack.push(move);
+	}
+	graph.forEach(row => {
+		row.forEach(cell => {
+			cell.visited = false;
+		})
+	})
+	return {graph, src: [-1, -1], dest: [-1, -1]};
+}
+
+// random maze generator 1.0.0
+
+/* const getRandomMove = (graph, i, j, n) => {
 	const possibleMoves = [];
 	moves.forEach((move) => {
 		if (
@@ -75,7 +124,7 @@ const getRandomMove = (graph, i, j, n) => {
 	return possibleMoves[randomInt(0, possibleMoves.length)];
 };
 
-export const generateMaze = (n) => {
+export const generateMaze2 = (n) => {
 	let graph = getDefaultGraph(n),
 		src = [randomInt(0, n[0]), randomInt(0, n[1])],
 		dest = [-1, -1],
@@ -104,4 +153,4 @@ export const generateMaze = (n) => {
 		})
 	})
 	return {graph, src: [-1, -1], dest: [-1, -1]};
-};
+}; */
